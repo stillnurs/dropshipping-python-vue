@@ -1,8 +1,11 @@
+from django.core.files import File
+from django.db import models
+from django.utils.text import slugify
+from django_extensions.db.fields import AutoSlugField
+
 from io import BytesIO
 from PIL import Image
 
-from django.core.files import File
-from django.db import models
 
 
 class Category(models.Model):
@@ -18,14 +21,20 @@ class Category(models.Model):
     def get_absolute_url(self):
         return f'/{self.slug}/'
 
+    def save(self, *args, **kwargs):
+        value = self.name
+        self.slug = slugify(value, allow_unicode=True)
+        super().save(*args, **kwargs)
 
 class Product(models.Model):
     category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE)
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=500)
     slug = models.SlugField()
-    description = models.TextField(blank=True, null=True)
+
     price = models.DecimalField(max_digits=6, decimal_places=2)
+    link = models.URLField(blank=True, null=True)
     image = models.ImageField(upload_to='uploads/', blank=True, null=True)
+    image_link = models.URLField(blank=True, null=True)
     thumbnail = models.ImageField(upload_to='uploads/', blank=True, null=True)
     date_added = models.DateTimeField(auto_now_add=True)
 
@@ -37,6 +46,11 @@ class Product(models.Model):
 
     def get_absolute_url(self):
         return f'/{self.category.slug}/{self.slug}/'
+    
+    def save(self, *args, **kwargs):
+        value = self.name
+        self.slug = slugify(value, allow_unicode=True)
+        super().save(*args, **kwargs)
 
     def get_image(self):
         if self.image:
