@@ -2,10 +2,11 @@
     <div class="page-product">
         <div class="columns is-multiline">
             <div class="column is-9">
+               
                 <figure class="image mb-6">
-                    <img v-bind:src="product.get_image">
+                    <img v-bind:src="product.image_link">
                 </figure>
-
+               
                 <h1 class="title">{{ product.name }}</h1>
 
                 <p>{{ product.description }}</p>
@@ -89,3 +90,15 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+figure {
+    margin-left: 200px;
+    width: 300px;
+    height: auto;
+}
+.image {
+    border-radius: 20px;
+
+}
+</style>

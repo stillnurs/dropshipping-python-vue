@@ -1,12 +1,15 @@
 from django.conf import settings
+from django.db import transaction
 
+import sqlite3
 import time
 import pandas as pd
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
+from sqlalchemy import create_engine
 
-from product.models import Product
+from product.models import Product, Category
 
 
 
@@ -35,32 +38,34 @@ class Scraper():
         # marking the "html" anchor for scrolling the page
         html = browser.find_element_by_tag_name('html')
         i = 0
-        while i<15:
+        while i<11:
             time.sleep(1)
             html.send_keys(Keys.PAGE_DOWN)
             i+=1
         
         names = browser.find_elements_by_xpath("//*[starts-with(@class, 'kcs0h5-0 diNcmV grid')]")
         prices = browser.find_elements_by_xpath("//*[starts-with(@data-qa, 'productPrice')]")
-        link_list = browser.find_elements_by_xpath('//*[starts-with(@class, "productImage")]//img')
+        image_links = browser.find_elements_by_xpath('//*[starts-with(@class, "productImage")]//img')
         product_links = browser.find_elements_by_xpath("//*[starts-with(@class, 'productContainer')]//a")
         
         # add product data to data dict
-        data = dict()
+        data = {}
+        data['category_id'] = '4'
         try:
             data['name'] = [i.get_attribute('title') for i in names]
+            data['slug'] = [i.get_attribute('title').strip().replace(' ', '-') for i in names]
         except Exception as e:
             data['name'] = '-name not found-'
         try:
-            data['price'] = [i.text for i in prices]
+            data['price'] = [float(i.text) for i in prices]
         except Exception as e:
             data['price'] = '-price not found-'
         try:
-            data['link'] = [i.get_attribute('href') for i in product_links]
+            data['link'] = [i.get_attribute('href').strip() for i in product_links]
         except Exception as e:
             data['link'] = '-link not found-'
         try:    
-            data['image_link'] = [i.get_attribute('src') for i in link_list]
+            data['image_link'] = [i.get_attribute('src').strip() for i in image_links]
         except Exception as e:
             data['image_link'] = '-image link not found-'
 
@@ -70,23 +75,32 @@ class Scraper():
         # creating a dataframe with Pandas
         dataframe = pd.DataFrame(data)
 
+        print(f"=====>{len(data['name'])}")
+        print(f"=====>{len(data['slug'])}")
+        print(f"=====>{len(data['price'])}")
+        print(f"=====>{len(data['link'])}")
+        print(f"=====>{len(data['image_link'])}")
+        
         return dataframe
 
 
 
     def run(self):
+        user = settings.DATABASES['default']['USER']
+        passwd = settings.DATABASES['default']['PASSWORD']
+        dbname = settings.DATABASES['default']['NAME']
+        
+        conn = 'postgresql://{user}:{passwd}@localhost:5432/{dbname}'.format(
+        user=user,
+        passwd=passwd,
+        dbname=dbname
+        )
 
+        connection = create_engine(conn, echo=False)
         dataframe = self.get_data()
-        dataframe.to_csv('dropship_django/productDetails.csv', index=False)
+        # dataframe['id'] = dataframe.index + 1
+        dataframe.to_csv('/hdd/sda1/Desktop/My_projects/dropshipping-python-vue/dropship_django/productDetails.csv')
+        
+        dataframe.to_sql('products', connection, if_exists='append', index=False, method="multi")
 
 
-
-
-# HEADERS = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36"}
-
-# URL = 'https://www.noon.com/uae-en/electronics-and-mobiles/mobiles-and-accessories/mobiles-20905'
-# headers = settings.HEADERS
-# dataframe = Scraper(URL, HEADERS)
-# dataframe.get_data()
-
-# dataframe.write()
