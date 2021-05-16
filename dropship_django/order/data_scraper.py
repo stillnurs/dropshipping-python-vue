@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db import transaction
 
-import sqlite3
+import requests
 import time
 import pandas as pd
 from selenium import webdriver
@@ -15,20 +15,10 @@ from product.models import Product, Category
 
 class Scraper():
 
-    def __init__(self, url, headers):
+    def __init__(self, url):
         self.url = url
-        self.headers = headers
-    
-    
-    def get_html(self):
-        url = self.url
-        headers = self.headers
-            
-        response = requests.get(url, headers=headers)
-        html = response.text
-        return html
 
-
+    
     def get_data(self):
         options = Options()
         options.page_load_strategy = 'normal'
@@ -50,7 +40,7 @@ class Scraper():
         
         # add product data to data dict
         data = {}
-        data['category_id'] = '4'
+        data['category_id'] = '1'
         try:
             data['name'] = [i.get_attribute('title') for i in names]
             data['slug'] = [i.get_attribute('title').strip().replace(' ', '-') for i in names]
@@ -99,7 +89,7 @@ class Scraper():
         connection = create_engine(conn, echo=False)
         dataframe = self.get_data()
         # dataframe['id'] = dataframe.index + 1
-        dataframe.to_csv('/hdd/sda1/Desktop/My_projects/dropshipping-python-vue/dropship_django/productDetails.csv')
+        # dataframe.to_csv('/hdd/sda1/Desktop/My_projects/dropshipping-python-vue/dropship_django/productDetails.csv')
         
         dataframe.to_sql('products', connection, if_exists='append', index=False, method="multi")
 
