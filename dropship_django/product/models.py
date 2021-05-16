@@ -146,19 +146,19 @@ class Product(models.Model):
     
 
 class ProductImage(models.Model):
-    product = models.ForeignKey(Product, on_delete=)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     image = models.ImageField(null=True, blank=True)
 
 class ProductPrice(models.Model):
-    product = models.ForeignKey(Product)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
 
 class ProductColor(models.Model):
-    product = models.ForeignKey(Product)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     color = models.URLField(null=True, blank=True)
 
-class ProductStorage(models.Model):
-    product = models.ForeignKey(Product)
-    storage = models.IntegerField(max_length=6, null=True, blank=True)
+class ProductSize(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    size = models.IntegerField(null=True, blank=True)
 
     
