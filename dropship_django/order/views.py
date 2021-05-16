@@ -51,3 +51,4 @@ class OrdersList(APIView):
         orders = Order.objects.filter(user=request.user)
         serializer = MyOrderSerializer(orders, many=True)
         return Response(serializer.data)
+

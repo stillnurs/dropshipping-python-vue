@@ -1,5 +1,6 @@
 from django.core.files import File
 from django.db import models
+from django.db.models.fields import TextField
 from django.utils.text import slugify
 from django_extensions.db.fields import AutoSlugField
 
@@ -42,6 +43,7 @@ class Product(models.Model):
     link = models.URLField(blank=True, null=True)
     image = models.ImageField(upload_to='uploads/', blank=True, null=True)
     image_link = models.URLField(blank=True, null=True)
+    description = models.TextField(null=True, blank=True)
     thumbnail = models.ImageField(upload_to='uploads/', blank=True, null=True)
     # date_added = models.DateTimeField(auto_now_add=True)
 
@@ -139,3 +141,24 @@ class Product(models.Model):
             except:
                 return False
         else: return False
+
+
+    
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=)
+    image = models.ImageField(null=True, blank=True)
+
+class ProductPrice(models.Model):
+    product = models.ForeignKey(Product)
+    price = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+
+class ProductColor(models.Model):
+    product = models.ForeignKey(Product)
+    color = models.URLField(null=True, blank=True)
+
+class ProductStorage(models.Model):
+    product = models.ForeignKey(Product)
+    storage = models.IntegerField(max_length=6, null=True, blank=True)
+
+    
