@@ -12,6 +12,7 @@ from PIL import Image
 
 
 
+# Outside function serving pathway for image files
 def get_upload_path(instance, filename):
     name = instance.product.name
     slug = slugify(name)
@@ -20,6 +21,11 @@ def get_upload_path(instance, filename):
 
 
 class BaseCategory(PolymorphicModel):
+
+    """
+    Base category abstract base class inherited from Polymorphic module class
+    """
+
     name = models.CharField(max_length=1000)
     slug = models.SlugField()
     description = models.TextField()
@@ -37,6 +43,10 @@ class BaseCategory(PolymorphicModel):
 
 
 class ParentCategory(BaseCategory):
+
+    """
+    Highest category class
+    """
     
     class Meta:
         verbose_name_plural = 'Parent Categories'
@@ -44,6 +54,11 @@ class ParentCategory(BaseCategory):
 
 
 class ChildCategory(BaseCategory):
+
+    """
+    Middle category class
+    """
+
     parent = models.ForeignKey(ParentCategory, related_name='category', on_delete=models.CASCADE)
     
     class Meta:
@@ -55,6 +70,9 @@ class ChildCategory(BaseCategory):
 
 
 class Category(BaseCategory):
+    """
+    Lowest category class
+    """
     parent = models.ForeignKey(ChildCategory, related_name='category', on_delete=models.CASCADE)
     
     class Meta:
@@ -66,10 +84,16 @@ class Category(BaseCategory):
 
 
 class BaseProduct(PolymorphicModel):
+
+    """
+    Base Product abstract base class model for all products inherited from Polymorphic module class
+    """
+
     category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=6, decimal_places=2)
     quantity = models.PositiveIntegerField(default=0)
+    description = models.TextField(blank=True, null=True)
 
     slug = models.SlugField()
     date_added = models.DateTimeField(auto_now_add=True)
@@ -86,8 +110,10 @@ class BaseProduct(PolymorphicModel):
 
     
 
-
 class Product(BaseProduct):
+    """
+    Product class as a blueprint for additional product types
+    """
 
     class Meta:
         verbose_name_plural = 'Products'
@@ -95,6 +121,10 @@ class Product(BaseProduct):
 
 
 class MobilePhone(BaseProduct):
+    """
+    Mobile Phone class inherited from Base Product class.
+    Serves for specific product types
+    """
     
     
     CELLULAR_CHOICES = ((1, '5G'),
@@ -124,6 +154,10 @@ class MobilePhone(BaseProduct):
 
 
 class Image(models.Model):
+    """
+    Image class for multiple image uploads for class product
+    """
+
     product = models.ForeignKey(BaseProduct, related_name='product_image', on_delete=models.CASCADE)
     image = models.ImageField(upload_to=get_upload_path)
     thumbnail = models.ImageField(upload_to=get_upload_path, blank=True, null=True)
