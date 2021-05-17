@@ -39,11 +39,17 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # django-extra modules
+    'polymorphic',
+    'multiselectfield',
+    
+    # django-rest-framework modules
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
     'djoser',
 
+    # my apps
     'product',
     'order'
 ]
