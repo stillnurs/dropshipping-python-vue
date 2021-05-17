@@ -2,6 +2,7 @@ from django.core.validators import MaxLengthValidator
 from django.db import models
 from django.db.models.enums import TextChoices
 from django.core.files import File
+from django.utils.text import slugify
 
 from polymorphic.models import PolymorphicModel
 from multiselectfield import MultiSelectField
@@ -12,56 +13,9 @@ from PIL import Image
 
 
 def get_upload_path(instance, filename):
-    model = instance.album.model.__class__._meta
-    name = model.verbose_name_plural.replace(' ', '_')
-    return f'{name}/images/{filename}'
-
-
-
-class ImageAlbum(PolymorphicModel):
-    def default(self):
-        return self.images.filter(default=True).first()
-    def thumbnails(self):
-        return self.images.filter(width__lt=100, length_lt=100)
-
-
-class ProductImage(PolymorphicModel):
-    name = models.CharField(max_length=255)
-    image = models.ImageField(upload_to=get_upload_path)
-    thumbnail = models.ImageField(upload_to=get_upload_path, blank=True, null=True)
-    default = models.BooleanField(default=False)
-    width = models.FloatField(default=100)
-    length = models.FloatField(default=100)
-    album = models.ForeignKey(ImageAlbum, related_name='images', on_delete=models.CASCADE)
-
-    def __str__(self):
-            return self.name
-
-    def get_image(self):
-        if self.image:
-            return 'http://127.0.0.1:8000' + self.image.url
-        return ''
-
-    def get_thumbnail(self):
-        if self.thumbnail:
-            return 'http://127.0.0.1:8000' + self.thumbnail.url
-        else:
-            if self.image:
-                self.thumbnail = self.make_thumbnail(self.image)
-                self.save()
-
-                return 'http://127.0.0.1:8000' + self.thumbnail.url
-            else:
-                return ''
-
-    def make_thumbnail(self, image, size=(300, 200)):
-        img = Image.open(image)
-        img.convert('RGB')
-        img.thumbnail(size)
-        thumb_io = BytesIO()
-        img.save(thumb_io, 'JPEG', quality=85)
-        thumbnail = File(thumb_io, name=image.name.replace('uploads/',''))
-        return thumbnail
+    name = instance.product.name
+    slug = slugify(name)
+    return "product_images/%s-%s" % (slug, filename)
 
 
 
@@ -113,8 +67,6 @@ class Category(BaseCategory):
 
 class BaseProduct(PolymorphicModel):
     category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE)
-    album = models.OneToOneField(ImageAlbum, related_name='model', on_delete=models.CASCADE)
-    # image = models.ForeignKey(Image, related_name='product_image', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=6, decimal_places=2)
     quantity = models.PositiveIntegerField(default=0)
@@ -132,6 +84,7 @@ class BaseProduct(PolymorphicModel):
     def get_absolute_url(self):
             return f'/{self.category.slug}/{self.slug}/'
 
+    
 
 
 class Product(BaseProduct):
@@ -167,3 +120,39 @@ class MobilePhone(BaseProduct):
 
     def __str__(self):
         return self.name
+
+
+
+class Image(models.Model):
+    product = models.ForeignKey(BaseProduct, related_name='product_image', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to=get_upload_path)
+    thumbnail = models.ImageField(upload_to=get_upload_path, blank=True, null=True)
+    default = models.BooleanField(default=False)
+    width = models.FloatField(default=100)
+    length = models.FloatField(default=100)
+
+    def get_image(self):
+        if self.image:
+            return 'http://127.0.0.1:8000' + self.image.url
+        return ''
+
+    def get_thumbnail(self):
+        if self.thumbnail:
+            return 'http://127.0.0.1:8000' + self.thumbnail.url
+        else:
+            if self.image:
+                self.thumbnail = self.make_thumbnail(self.image)
+                self.save()
+
+                return 'http://127.0.0.1:8000' + self.thumbnail.url
+            else:
+                return ''
+
+    def make_thumbnail(self, image, size=(300, 200)):
+        img = Image.open(image)
+        img.convert('RGB')
+        img.thumbnail(size)
+        thumb_io = BytesIO()
+        img.save(thumb_io, 'JPEG', quality=85)
+        thumbnail = File(thumb_io, name=image.name)
+        return thumbnail
