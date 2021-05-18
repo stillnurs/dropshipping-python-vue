@@ -25,7 +25,7 @@ class BaseCategory(PolymorphicModel):
     """
     Base category abstract base class inherited from Polymorphic module class
     """
-
+    owner = models.ForeignKey('auth.User', related_name='categories', on_delete=models.CASCADE)
     name = models.CharField(max_length=1000)
     slug = models.SlugField()
     description = models.TextField()
@@ -88,7 +88,7 @@ class BaseProduct(PolymorphicModel):
     """
     Base Product abstract base class model for all products inherited from Polymorphic module class
     """
-
+    owner = models.ForeignKey('auth.User', related_name='products', on_delete=models.CASCADE)
     category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=6, decimal_places=2)
@@ -127,11 +127,11 @@ class MobilePhone(BaseProduct):
     """
     
     
-    CELLULAR_CHOICES = ((1, '5G'),
-                        (2, '4G'),
-                        (3, 'LTE'),
-                        (4, 'GPRS'),
-                        (5, 'DUAL-SIM'),
+    CELLULAR_CHOICES = (('5G', '5G'),
+                        ('4G', '4G'),
+                        ('LTE', 'LTE'),
+                        ('GPRS', 'GPRS'),
+                        ('DUAL-SIM', 'DUAL-SIM'),
                         )
         
     brand = models.CharField(max_length=255)

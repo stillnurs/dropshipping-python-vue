@@ -50,13 +50,23 @@ INSTALLED_APPS = [
     'djoser',
 
     # my apps
+    'users',
     'product',
-    'order'
+    'order',
 ]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8080",
 ]
+
+
+# Rest-framework configs 
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

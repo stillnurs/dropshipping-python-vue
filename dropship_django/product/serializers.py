@@ -1,17 +1,21 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_polymorphic.serializers import PolymorphicSerializer
+
 from .models import *
 
 
-
-class BaseProductSerializer(serializers.ModelSerializer):
+class BaseProductSerializer(serializers.HyperlinkedModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.username')
+    highlight = serializers.HyperlinkedIdentityField(view_name='product-highlight', format='html')
+    
     class Meta:
         model = BaseProduct
         fields = '__all__'
 
 
 
-class ProductSerializer(serializers.ModelSerializer):
+class ProductSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = Product
@@ -19,7 +23,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 
-class MobilePhoneSerializer(serializers.ModelSerializer):
+class MobilePhoneSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = MobilePhone
@@ -27,15 +31,17 @@ class MobilePhoneSerializer(serializers.ModelSerializer):
 
 
 
-class BaseCategorySerializer(serializers.ModelSerializer):
-    
+class BaseCategorySerializer(serializers.HyperlinkedModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.username')
+    highlight = serializers.HyperlinkedIdentityField(view_name='category-highlight', format='html')
+
     class Meta:
         model = BaseCategory
         fields = '__all__'
 
 
 
-class ParentCategorySerializer(serializers.ModelSerializer):
+class ParentCategorySerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = ParentCategory
@@ -43,7 +49,7 @@ class ParentCategorySerializer(serializers.ModelSerializer):
 
 
 
-class ChildCategorySerializer(serializers.ModelSerializer):
+class ChildCategorySerializer(serializers.HyperlinkedModelSerializer):
     # category = CategorySerializer(many=True)
     
     class Meta:
@@ -53,7 +59,7 @@ class ChildCategorySerializer(serializers.ModelSerializer):
 
 
 
-class CategorySerializer(serializers.ModelSerializer):
+class CategorySerializer(serializers.HyperlinkedModelSerializer):
     # products = BaseProductSerializer(many=True)
 
     class Meta:
