@@ -1,15 +1,13 @@
+from io import BytesIO
+
+from django.core.files import File
 from django.core.validators import MaxLengthValidator
 from django.db import models
 from django.db.models.enums import TextChoices
-from django.core.files import File
 from django.utils.text import slugify
-
-from polymorphic.models import PolymorphicModel
 from multiselectfield import MultiSelectField
-
-from io import BytesIO
 from PIL import Image
-
+from polymorphic.models import PolymorphicModel
 
 
 # Outside function serving pathway for image files
@@ -89,6 +87,8 @@ class BaseProduct(PolymorphicModel):
     Base Product abstract base class model for all products inherited from Polymorphic module class
     """
     owner = models.ForeignKey('auth.User', related_name='products', on_delete=models.CASCADE)
+    parent_category = models.ForeignKey(ParentCategory, related_name='products', on_delete=models.CASCADE)
+    child_category = models.ForeignKey(ChildCategory, related_name='products', on_delete=models.CASCADE)
     category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=6, decimal_places=2)
@@ -108,15 +108,6 @@ class BaseProduct(PolymorphicModel):
     def get_absolute_url(self):
             return f'/{self.category.slug}/{self.slug}/'
 
-    
-
-class Product(BaseProduct):
-    """
-    Product class as a blueprint for additional product types
-    """
-
-    class Meta:
-        verbose_name_plural = 'Products'
 
 
 

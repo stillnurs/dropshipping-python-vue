@@ -1,6 +1,6 @@
 from django.db.models import Q
 from django.http import Http404
-from rest_framework import generics, permissions, renderers
+from rest_framework import permissions, renderers, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
@@ -50,70 +50,29 @@ from .serializers import *
 
 
 
-class BaseCategoryListView(generics.ListAPIView):
+class CategoryBaseViewSet(viewsets.ModelViewSet):
     queryset = BaseCategory.objects.all()
     serializer_class = CategoryPolymorphicSerializer
-    permission_classes = [IsOwnerOrReadOnly,]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,]
+    lookup_field = ('slug')
 
     
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
 
-
-class BaseCategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = BaseCategory.objects.all()
-    serializer_class = CategoryPolymorphicSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
-
-
-
-class BaseProductListView(generics.ListAPIView):
+class ProductBaseViewSet(viewsets.ModelViewSet):
     queryset = BaseProduct.objects.all()
     serializer_class = ProductPolymorphicSerializer
-    permission_classes = [IsOwnerOrReadOnly,]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,]
+    lookup_field = ('slug')
     
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
 
-class BaseProductDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = BaseProduct.objects.all()
-    serializer_class = ProductPolymorphicSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
-    
-
-# Creating an endpoint for the highlighted categories
-class BaseCategoryHighlight(generics.GenericAPIView):
-    queryset = BaseCategory.objects.all()
-    renderer_classes = [renderers.StaticHTMLRenderer]
-
-    def get(self, request, *args, **kwargs):
-        category = self.get_object()
-        return Response(category.highlighted)
-
-
-
-# Creating an endpoint for the highlighted products
-class BaseProductHighlight(generics.GenericAPIView):
-    queryset = BaseProduct.objects.all()
-    renderer_classes = [renderers.StaticHTMLRenderer]
-
-    def get(self, request, *args, **kwargs):
-        product = self.get_object()
-        return Response(product.highlighted)
-
-
-
-# Creating an Endpoint root for API
-@api_view(['GET'])
-def api_root(request, format=None):
-    return Response({
-        'categories': reverse('category-list', request=request, format=format),
-        'products': reverse('product-list', request=request, format=format)
-    })
 
 
 
@@ -123,8 +82,8 @@ def search(request):
     query = request.data.get('query', '')
 
     if query:
-        products = Product.objects.filter(Q(name__icontains=query) | Q(description__icontains=query))
-        serializer = ProductSerializer(products, many=True)
+        products = BaseProduct.objects.filter(Q(name__icontains=query) | Q(description__icontains=query))
+        serializer = BaseProductSerializer(products, many=True)
         return Response(serializer.data)
     else:
         return Response({"products": []})
