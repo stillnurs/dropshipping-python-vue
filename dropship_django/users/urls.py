@@ -7,8 +7,7 @@ from rest_framework.routers import DefaultRouter
 from . import views
 
 router = DefaultRouter()
-router.register('^users/list/$', views.UserViewSet, 'user-list')
-router.register('^user/{pk}/$', views.UserViewSet, basename='user-detail')
+router.register('', views.UserViewSet)
 
 
 urlpatterns = [

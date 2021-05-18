@@ -53,7 +53,7 @@ from .serializers import *
 class CategoryBaseViewSet(viewsets.ModelViewSet):
     queryset = BaseCategory.objects.all()
     serializer_class = CategoryPolymorphicSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,]
     lookup_field = ('slug')
 
     

@@ -5,7 +5,7 @@ from rest_polymorphic.serializers import PolymorphicSerializer
 from .models import *
 
 
-class BaseProductSerializer(serializers.ModelSerializer):
+class BaseProductSerializer(serializers.HyperlinkedModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.username')
 
     class Meta:
@@ -14,7 +14,7 @@ class BaseProductSerializer(serializers.ModelSerializer):
 
 
 
-class MobilePhoneSerializer(serializers.ModelSerializer):
+class MobilePhoneSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = MobilePhone
@@ -23,7 +23,7 @@ class MobilePhoneSerializer(serializers.ModelSerializer):
 
 
 
-class BaseCategorySerializer(serializers.ModelSerializer):
+class BaseCategorySerializer(serializers.HyperlinkedModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.username')
 
     # category = serializers.HyperlinkedRelatedField(many=True, view_name='mobilephone-detail', queryset=MobilePhone.objects.all())
@@ -34,14 +34,14 @@ class BaseCategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ParentCategorySerializer(serializers.ModelSerializer):
+class ParentCategorySerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = ParentCategory
         fields = '__all__'
 
 
-class ChildCategorySerializer(serializers.ModelSerializer):
+class ChildCategorySerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = ChildCategory
@@ -49,7 +49,7 @@ class ChildCategorySerializer(serializers.ModelSerializer):
 
 
 
-class CategorySerializer(serializers.ModelSerializer):
+class CategorySerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Category
