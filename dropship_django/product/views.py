@@ -1,11 +1,9 @@
-from django.db.models import Q
 from django.http import Http404
 from rest_framework import permissions, renderers, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
-
-from management.permissions.permissions import IsOwnerOrReadOnly
+from utils.permissions.permissions import IsOwnerOrReadOnly
 
 from .models import *
 from .serializers import *
@@ -48,31 +46,57 @@ from .serializers import *
 
 
 
+class StoreViewSet(viewsets.ModelViewSet):
+    queryset = Store.objects.all()
+    serializer_class = StoreSerializer
+    permissions_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
 
-class CategoryBaseViewSet(viewsets.ModelViewSet):
-    queryset = BaseCategory.objects.all()
-    serializer_class = CategoryPolymorphicSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly,]
-    lookup_field = ('slug')
+
+class StoreDirectoryViewSet(viewsets.ModelViewSet):
+    queryset = StoreDirectory.objects.all()
+    serializer_class = StoreDirectorySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
 
-class ProductBaseViewSet(viewsets.ModelViewSet):
-    queryset = BaseProduct.objects.all()
-    serializer_class = ProductPolymorphicSerializer
+
+class ParentCategoryViewSet(viewsets.ModelViewSet):
+    queryset = ParentCategory.objects.all()
+    serializer_class = ParentCategorySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+
+    
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+
+
+class ChildCategoryViewSet(viewsets.ModelViewSet):
+    queryset = ChildCategory.objects.all()
+    serializer_class = ChildCategorySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+
+    
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+
+
+class BaseProductModelViewSet(viewsets.ModelViewSet):
+    queryset = BaseProductModel.objects.all()
+    serializer_class = BaseProductModelSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,]
-    lookup_field = ('slug')
     
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
-
-
-
 
 
 

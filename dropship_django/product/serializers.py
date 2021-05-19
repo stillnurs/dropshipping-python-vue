@@ -1,74 +1,60 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from rest_polymorphic.serializers import PolymorphicSerializer
 
 from .models import *
 
 
-class BaseProductSerializer(serializers.HyperlinkedModelSerializer):
+class BaseProductModelSerializer(serializers.HyperlinkedModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.username')
+    images = serializers.HyperlinkedRelatedField(
+        view_name='product_image', many=True, read_only=True)
 
     class Meta:
-        model = BaseProduct
-        fields = '__all__'
+        model = BaseProductModel
+        fields = ('__all__', 'owner', 'images')
 
 
-
-class MobilePhoneSerializer(serializers.HyperlinkedModelSerializer):
-
+class ImageSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = MobilePhone
-        fields = '__all__'
-        
+        model = Image
+        fields = '__all__'      
 
-
-
-class BaseCategorySerializer(serializers.HyperlinkedModelSerializer):
-    owner = serializers.ReadOnlyField(source='owner.username')
-
-    # category = serializers.HyperlinkedRelatedField(many=True, view_name='mobilephone-detail', queryset=MobilePhone.objects.all())
-
-
-    class Meta:
-        model = BaseCategory
-        fields = '__all__'
-
-
-class ParentCategorySerializer(serializers.HyperlinkedModelSerializer):
-
-    class Meta:
-        model = ParentCategory
-        fields = '__all__'
 
 
 class ChildCategorySerializer(serializers.HyperlinkedModelSerializer):
+    products = serializers.HyperlinkedRelatedField(
+        view_name='child-products', many=True, read_only=True)
 
     class Meta:
         model = ChildCategory
-        fields = '__all__'
+        fields = ('__all__', 'child-products')
 
 
 
-class CategorySerializer(serializers.HyperlinkedModelSerializer):
+class ParentCategorySerializer(serializers.HyperlinkedModelSerializer):
+    child_categories = serializers.HyperlinkedRelatedField(
+        view_name='child_categories', many=True, read_only=True)
+    class Meta:
+        model = ParentCategory
+        fields = ('__all__', 'child_categories')
+
+
+
+class StoreDirectorySerializer(serializers.HyperlinkedModelSerializer):
+    parent_categories = serializers.HyperlinkedRelatedField(
+        view_name='parent_categories', many=True, read_only=True)
 
     class Meta:
-        model = Category
-        fields = '__all__'
+        model = ParentCategory
+        fields = ('__all__', 'parent_categories')
 
 
 
-class ProductPolymorphicSerializer(PolymorphicSerializer):
-    model_serializer_mapping = {
-        BaseProduct: BaseProductSerializer,
-        MobilePhone: MobilePhoneSerializer
-        }
+class StoreSerializer(serializers.HyperlinkedModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.username')
+    directories = serializers.HyperlinkedRelatedField(
+        view_name='directories', many=True, read_only=True)
 
-
-
-class CategoryPolymorphicSerializer(PolymorphicSerializer):
-    model_serializer_mapping = {
-        BaseCategory: BaseCategorySerializer,
-        ParentCategory: ParentCategorySerializer,
-        ChildCategory: ChildCategorySerializer,
-        Category: CategorySerializer
-    }
+    class Meta:
+        model = Store
+        fields = ('__all__', 'directories')
