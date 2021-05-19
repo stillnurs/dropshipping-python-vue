@@ -15,5 +15,5 @@ router.register('products', views.BaseProductModelViewSet)
 
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('products/', include(router.urls))
 ]

@@ -7,10 +7,10 @@ from rest_framework.routers import DefaultRouter
 from . import views
 
 router = DefaultRouter()
-router.register('shoppers/', views.ShoperViewSet)
-router.register('vendors/', views.VendorViewSet)
+router.register('shoppers', views.ShoperViewSet)
+router.register('vendors', views.VendorViewSet)
 
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('profile', include(router.urls)),
 ]

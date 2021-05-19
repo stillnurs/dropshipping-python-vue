@@ -1,8 +1,5 @@
-from django.contrib.auth.base_user import AbstractBaseUser
-from django.contrib.auth.models import PermissionsMixin, User
+from django.contrib.auth.models import User
 from django.db import models
-from django.db.models.deletion import SET_NULL
-from django.db.models.fields import related
 
 
 class UserModel(models.Model):
@@ -31,7 +28,7 @@ class ShopperProfile(UserModel):
         verbose_name_plural = 'Shopper Profiles'
     
     def __str__(self):
-        return self.name
+        return self.username
 
 
 class VendorProfile(UserModel):
@@ -44,5 +41,5 @@ class VendorProfile(UserModel):
         verbose_name_plural = 'Vendor Profiles'
 
     def __str__(self):
-        return self.name
+        return self.username
 

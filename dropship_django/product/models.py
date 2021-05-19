@@ -9,7 +9,7 @@ from django.db.models.fields import DateField, related
 from django.utils.text import slugify
 from multiselectfield import MultiSelectField
 from PIL import Image
-from users.models import VendorProfile
+from profile.models import VendorProfile
 
 
 # Outside function serving pathway for image files
@@ -22,7 +22,7 @@ def get_upload_path(instance, filename):
 
 class Store(models.Model):
     """
-    Store model, used to create store objects
+    Store model, used to create stores
     """
     owner = models.ForeignKey(VendorProfile, related_name='stores', on_delete=models.CASCADE)
     name = models.CharField(max_length=150)
@@ -49,7 +49,7 @@ class StoreDirectory(models.Model):
     """
     Base Store Directory class, to create store directory objects
     """
-
+    owner = models.ForeignKey(VendorProfile, related_name='store_directories', on_delete=models.CASCADE)
     store = models.ForeignKey(Store, related_name='directories', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     slug = models.SlugField()
@@ -72,9 +72,9 @@ class StoreDirectory(models.Model):
 
 class ParentCategory(models.Model):
     """
-    Parent category class, lays under catalog
+    Parent category class, lays under directories
     """
-
+    owner = models.ForeignKey(VendorProfile, related_name='parent_categories', on_delete=models.CASCADE)
     directory = models.ForeignKey(
         StoreDirectory, related_name='parent_categories', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
@@ -95,7 +95,7 @@ class ChildCategory(models.Model):
     """
     Child category class, lowest category
     """
-
+    owner = models.ForeignKey(VendorProfile, related_name='child_categories', on_delete=models.CASCADE)
     parent = models.ManyToManyField(
         ParentCategory, related_name='child_categories')
     name = models.CharField(max_length=255)
@@ -123,7 +123,8 @@ class BaseProductModel(models.Model):
 
 
     # product base relations
-    owner = models.ForeignKey(VendorProfile, related_name='vendor_products', on_delete=models.CASCADE)
+    owner = models.ForeignKey(
+        VendorProfile, related_name='products', on_delete=models.CASCADE)
     store = models.ManyToManyField(Store, related_name='store_products')
     parent_category = models.ManyToManyField(ParentCategory, related_name='parent_products')
     child_category = models.ManyToManyField(ChildCategory, related_name='child_products')
@@ -165,7 +166,7 @@ class Image(models.Model):
     Image class for multiple image uploads for class product
     """
 
-    product = models.ForeignKey(BaseProductModel, related_name='product_image', on_delete=models.CASCADE)
+    product = models.ForeignKey(BaseProductModel, related_name='images', on_delete=models.CASCADE)
     image = models.ImageField(upload_to=get_upload_path)
     thumbnail = models.ImageField(upload_to=get_upload_path, blank=True, null=True)
     default = models.BooleanField(default=False)

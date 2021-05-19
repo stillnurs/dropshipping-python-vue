@@ -4,7 +4,6 @@ from django.db.models import base
 from .models import *
 
 
-
 class ImageInline(admin.StackedInline):
         model = Image
 
