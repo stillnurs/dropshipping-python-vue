@@ -11,7 +11,9 @@ class BaseProductModelSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = BaseProductModel
-        fields = ('__all__', 'owner', 'images')
+        fields = ['url', 'id', 'owner', 'parent_category', 
+        'child_category', 'name', 'brand', 'price', 'description',
+        'product_type', 'in_stock', 'stock', 'weight', 'images']
 
 
 class ImageSerializer(serializers.HyperlinkedModelSerializer):
@@ -27,7 +29,7 @@ class ChildCategorySerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = ChildCategory
-        fields = ('__all__', 'child-products')
+        fields = ['url', 'id', 'owner', 'parent', 'name', 'description', 'products']
 
 
 
@@ -36,7 +38,8 @@ class ParentCategorySerializer(serializers.HyperlinkedModelSerializer):
         view_name='child_categories', many=True, read_only=True)
     class Meta:
         model = ParentCategory
-        fields = ('__all__', 'child_categories')
+        fields = ['url', 'id', 'owner', 'directory', 'name', 'description', 'child_categories']
+
 
 
 
@@ -45,8 +48,8 @@ class StoreDirectorySerializer(serializers.HyperlinkedModelSerializer):
         view_name='parent_categories', many=True, read_only=True)
 
     class Meta:
-        model = ParentCategory
-        fields = ('__all__', 'parent_categories')
+        model = StoreDirectory
+        fields = ['url', 'id', 'owner', 'store', 'name', 'description', 'parent_categories']
 
 
 
@@ -57,4 +60,4 @@ class StoreSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Store
-        fields = ('__all__', 'directories')
+        fields = ['url', 'id', 'owner', 'name', 'description', 'directories']

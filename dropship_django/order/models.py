@@ -1,6 +1,6 @@
-from django.contrib.auth.models import User
 from django.db import models
 from product.models import BaseProductModel
+from profile.models import User
 
 
 class Order(models.Model):

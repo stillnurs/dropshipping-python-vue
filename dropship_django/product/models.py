@@ -74,7 +74,8 @@ class ParentCategory(models.Model):
     """
     Parent category class, lays under directories
     """
-    owner = models.ForeignKey(VendorProfile, related_name='parent_categories', on_delete=models.CASCADE)
+    owner = models.ForeignKey(
+        VendorProfile, related_name='parent_categories', on_delete=models.CASCADE)
     directory = models.ForeignKey(
         StoreDirectory, related_name='parent_categories', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
@@ -141,7 +142,7 @@ class BaseProductModel(models.Model):
     stock = models.IntegerField(
         default=0, help_text='stock quantity in pcs/packs etc.')
     weight = models.DecimalField(
-        max_digits=10, decimal_places=2, help_text='weight of mobile in gramms')
+        max_digits=10, decimal_places=2, help_text='weight of mobile in gramms', blank=True, null=True)
     specifications = models.JSONField(
         verbose_name='additional product specifications', blank=True, null=True)
     slug = models.SlugField(unique=True)
