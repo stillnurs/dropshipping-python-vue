@@ -158,20 +158,20 @@ class UserSerializer(serializers.Serializer):
     
     class Meta:
         model = User
-        fields = '__all__'
+        fields = 'username'
 
 
-class VendorProfileSerializer(serializers.HyperlinkedModelSerializer):
-    user = serializers.CharField()
-        
+class VendorProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer('username')
+
     class Meta:
         model = VendorProfile
         fields = ['url', 'id', 'user', 'first_name', 'last_name', 'dob', 'phone_number', 'address', 'zipcode']
 
 
         
-class ShopperProfileSerializer(serializers.HyperlinkedModelSerializer):
-    user = serializers.CharField()
+class ShopperProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer('username')
 
     class Meta:
         model = ShopperProfile
