@@ -11,7 +11,7 @@ class BaseProductModelSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = BaseProductModel
-        fields = ['url', 'id', 'owner', 'parent_category', 
+        fields = ['url', 'id', 'owner', 'directory', 'parent_category', 
         'child_category', 'name', 'brand', 'price', 'description',
         'product_type', 'in_stock', 'stock', 'weight', 'images']
 

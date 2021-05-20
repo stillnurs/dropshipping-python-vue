@@ -3,7 +3,10 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import (DjangoUnicodeDecodeError, force_str,
                                    smart_bytes, smart_str)
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from product.serializers import StoreSerializer
+from product.serializers import (BaseProductModelSerializer,
+                                 ChildCategorySerializer,
+                                 ParentCategorySerializer,
+                                 StoreDirectorySerializer, StoreSerializer)
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
@@ -149,28 +152,30 @@ class LogoutSerializer(serializers.Serializer):
         except TokenError:
             self.fail('bad_token')
 
-
-
 class UserSerializer(serializers.Serializer):
+    
     class Meta:
         model = User
         fields = '__all__'
 
 
-
 class VendorProfileSerializer(serializers.HyperlinkedModelSerializer):
-    user = UserSerializer()
-    stores = StoreSerializer()
-
+    queryset = User.objects.all()
+    user = serializers.ChoiceField(queryset)
+    dob = serializers.DateField()
+    
     class Meta:
         model = VendorProfile
-        fields = ['url', 'id', 'user', 'stores', 'first_name', 'last_name', 'dob', 'phone_number', 'address', 'zipcode']
+        fields = ['url', 'id', 'user', 'first_name', 'last_name', 'dob', 'phone_number', 'address', 'zipcode']
 
         
 class ShopperProfileSerializer(serializers.HyperlinkedModelSerializer):
-    user = UserSerializer()
+    queryset = User.objects.all()
+    user = serializers.ChoiceField(queryset)
+    dob = serializers.DateField()
 
     class Meta:
         model = ShopperProfile
         fields = 'url', 'id', 'user', 'first_name', 'last_name', 'dob', 'phone_number', 'address', 'zipcode'
+
 

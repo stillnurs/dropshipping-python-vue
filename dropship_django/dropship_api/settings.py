@@ -77,13 +77,15 @@ CORS_ALLOWED_ORIGINS = [
 
 
 SWAGGER_SETTINGS = {
-    'SECURITY_DEFINITIONS': {
+ 'SECURITY_DEFINITIONS': {
         'Bearer': {
             'type': 'apiKey',
             'name': 'Authorization',
             'in': 'header'
-        }
-    }
+        },
+    },
+    'LOGIN_URL': '/api/login/',
+    'LOGOUT_URL': 'api/logout/',
 }
 
 

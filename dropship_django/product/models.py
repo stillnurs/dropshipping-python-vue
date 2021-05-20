@@ -1,4 +1,5 @@
 from io import BytesIO
+from profile.models import VendorProfile
 
 from django.core.files import File
 from django.core.validators import MaxLengthValidator
@@ -9,7 +10,6 @@ from django.db.models.fields import DateField, related
 from django.utils.text import slugify
 from multiselectfield import MultiSelectField
 from PIL import Image
-from profile.models import VendorProfile
 
 
 # Outside function serving pathway for image files
@@ -98,8 +98,8 @@ class ChildCategory(models.Model):
     Child category class, lowest category
     """
     owner = models.ForeignKey(VendorProfile, related_name='child_categories', on_delete=models.CASCADE)
-    parent = models.ManyToManyField(
-        ParentCategory, related_name='child_categories')
+    parent = models.ForeignKey(
+        ParentCategory, related_name='child_categories', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     slug = models.SlugField()
     description = models.TextField()
@@ -127,9 +127,10 @@ class BaseProductModel(models.Model):
     # product base relations
     owner = models.ForeignKey(
         VendorProfile, related_name='products', on_delete=models.CASCADE)
-    store = models.ManyToManyField(Store, related_name='store_products')
-    parent_category = models.ManyToManyField(ParentCategory, related_name='parent_products')
-    child_category = models.ManyToManyField(ChildCategory, related_name='child_products')
+    store = models.ForeignKey(Store, related_name='store_products', on_delete=models.CASCADE)
+    directory = models.ForeignKey(StoreDirectory, related_name='product_directories', on_delete=models.CASCADE)
+    parent_category = models.ForeignKey(ParentCategory, related_name='parent_products', on_delete=models.CASCADE)
+    child_category = models.ForeignKey(ChildCategory, related_name='child_products', on_delete=models.CASCADE)
 
     # product specifications
     name = models.CharField(max_length=255)
