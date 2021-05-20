@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.http import Http404
 from rest_framework import permissions, renderers, viewsets
 from rest_framework.decorators import api_view
@@ -49,7 +50,7 @@ from .serializers import *
 class StoreViewSet(viewsets.ModelViewSet):
     queryset = Store.objects.all()
     serializer_class = StoreSerializer
-    permissions_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -59,7 +60,6 @@ class StoreViewSet(viewsets.ModelViewSet):
 class StoreDirectoryViewSet(viewsets.ModelViewSet):
     queryset = StoreDirectory.objects.all()
     serializer_class = StoreDirectorySerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     
     def perform_create(self, serializer):
@@ -70,7 +70,6 @@ class StoreDirectoryViewSet(viewsets.ModelViewSet):
 class ParentCategoryViewSet(viewsets.ModelViewSet):
     queryset = ParentCategory.objects.all()
     serializer_class = ParentCategorySerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     
     def perform_create(self, serializer):
@@ -81,7 +80,6 @@ class ParentCategoryViewSet(viewsets.ModelViewSet):
 class ChildCategoryViewSet(viewsets.ModelViewSet):
     queryset = ChildCategory.objects.all()
     serializer_class = ChildCategorySerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     
     def perform_create(self, serializer):
@@ -92,7 +90,6 @@ class ChildCategoryViewSet(viewsets.ModelViewSet):
 class BaseProductModelViewSet(viewsets.ModelViewSet):
     queryset = BaseProductModel.objects.all()
     serializer_class = BaseProductModelSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,]
     
 
     def perform_create(self, serializer):
@@ -106,8 +103,8 @@ def search(request):
     query = request.data.get('query', '')
 
     if query:
-        products = BaseProduct.objects.filter(Q(name__icontains=query) | Q(description__icontains=query))
-        serializer = BaseProductSerializer(products, many=True)
+        products = BaseProductModel.objects.filter(Q(name__icontains=query) | Q(description__icontains=query))
+        serializer = BaseProductModelSerializer(products, many=True)
         return Response(serializer.data)
     else:
         return Response({"products": []})

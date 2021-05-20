@@ -9,7 +9,7 @@ from django.db.models.enums import TextChoices
 from django.db.models.fields import DateField, related
 from django.utils.text import slugify
 from multiselectfield import MultiSelectField
-from PIL import Image
+from PIL import Image as PL
 
 
 # Outside function serving pathway for image files
@@ -60,7 +60,7 @@ class StoreDirectory(models.Model):
 
     class Meta:
         ordering = ('name',)
-        verbose_name_plural = 'Base Categories'
+        verbose_name_plural = 'Store Directories'
 
     def __str__(self):
         return self.name
@@ -88,6 +88,9 @@ class ParentCategory(models.Model):
     class Meta:
         verbose_name_plural = 'Parent Categories'
 
+    def __str__(self):
+        return self.name
+
     def get_absolute_url(self):
         return f'/{self.directory.slug}/{self.slug}/'
 
@@ -108,6 +111,9 @@ class ChildCategory(models.Model):
     
     class Meta:
         verbose_name_plural = 'Child Categories'
+
+    def __str__(self):
+        return self.name
 
     def get_absolute_url(self):
                     return f'/{self.parent.slug}/{self.slug}/'
@@ -192,10 +198,10 @@ class Image(models.Model):
                 return ''
 
     def make_thumbnail(self, image, size=(300, 200)):
-        img = Image.open(image)
+        img = PL.open(image)
         img.convert('RGB')
         img.thumbnail(size)
         thumb_io = BytesIO()
         img.save(thumb_io, 'JPEG', quality=85)
-        thumbnail = File(thumb_io, name=image.name)
+        thumbnail = File(thumb_io, name=image.name.replace('store/', ''))
         return thumbnail

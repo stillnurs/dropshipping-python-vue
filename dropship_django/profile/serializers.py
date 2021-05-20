@@ -152,6 +152,8 @@ class LogoutSerializer(serializers.Serializer):
         except TokenError:
             self.fail('bad_token')
 
+
+
 class UserSerializer(serializers.Serializer):
     
     class Meta:
@@ -160,22 +162,18 @@ class UserSerializer(serializers.Serializer):
 
 
 class VendorProfileSerializer(serializers.HyperlinkedModelSerializer):
-    queryset = User.objects.all()
-    user = serializers.ChoiceField(queryset)
-    dob = serializers.DateField()
-    
+    user = serializers.CharField()
+        
     class Meta:
         model = VendorProfile
         fields = ['url', 'id', 'user', 'first_name', 'last_name', 'dob', 'phone_number', 'address', 'zipcode']
 
+
         
 class ShopperProfileSerializer(serializers.HyperlinkedModelSerializer):
-    queryset = User.objects.all()
-    user = serializers.ChoiceField(queryset)
-    dob = serializers.DateField()
+    user = serializers.CharField()
 
     class Meta:
         model = ShopperProfile
-        fields = 'url', 'id', 'user', 'first_name', 'last_name', 'dob', 'phone_number', 'address', 'zipcode'
-
+        fields = ['url', 'id', 'user', 'first_name', 'last_name', 'dob', 'phone_number', 'address', 'zipcode']
 

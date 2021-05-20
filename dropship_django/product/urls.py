@@ -7,11 +7,11 @@ from rest_framework.routers import DefaultRouter
 from . import views
 
 router = DefaultRouter()
-router.register('stores', views.StoreViewSet)
-router.register('directories', views.StoreDirectoryViewSet)
-router.register('parent-categories', views.ParentCategoryViewSet)
-router.register('child-categories', views.ChildCategoryViewSet)
-router.register('products', views.BaseProductModelViewSet)
+router.register(r'stores', views.StoreViewSet)
+router.register(r'directories', views.StoreDirectoryViewSet)
+router.register(r'parent-categories', views.ParentCategoryViewSet)
+router.register(r'child-categories', views.ChildCategoryViewSet)
+router.register(r'products', views.BaseProductModelViewSet)
 
 
 urlpatterns = [

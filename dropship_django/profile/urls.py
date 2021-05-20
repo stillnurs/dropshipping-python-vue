@@ -1,13 +1,13 @@
-from django.urls import path, include
-from rest_framework_simplejwt.views import (
-    TokenRefreshView,
-)
+from django.urls import include, path
 from rest_framework.routers import SimpleRouter
+from rest_framework_simplejwt.views import TokenRefreshView
+
 from .views import *
 
 router = SimpleRouter()
-router.register('shoppers', ShoperViewSet)
-router.register('vendors', VendorViewSet)
+router.register(r'shoppers', ShoperViewSet)
+router.register(r'vendors', VendorViewSet)
+
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name="register"),
@@ -21,5 +21,6 @@ urlpatterns = [
          PasswordTokenCheckAPI.as_view(), name='password-reset-confirm'),
     path('password-reset-complete', SetNewPasswordAPIView.as_view(),
          name='password-reset-complete'),
-    path('profile/', include(router.urls))
+         
+    path('users/', include(router.urls))
 ]

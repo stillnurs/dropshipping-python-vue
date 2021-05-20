@@ -23,10 +23,15 @@ from .renderers import UserRenderer
 from .serializers import *
 
 
+class CustomRedirect(HttpResponsePermanentRedirect):
+    allowed_schemes = [os.environ.get('APP_SCHEME'), 'http', 'https']
+
+    
+
 class RegisterView(generics.GenericAPIView):
 
     serializer_class = RegisterSerializer
-    renderer_classes = (UserRenderer,)
+    # renderer_classes = (UserRenderer,)
 
     def post(self, request):
         user = request.data
@@ -168,10 +173,11 @@ class LogoutAPIView(generics.GenericAPIView):
 class ShoperViewSet(viewsets.ModelViewSet):
     queryset = ShopperProfile.objects.all()
     serializer_class = ShopperProfileSerializer 
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,]
 
 
 
 class VendorViewSet(viewsets.ModelViewSet):
     queryset = VendorProfile.objects.all()
     serializer_class = VendorProfileSerializer
-    permission_classes = [IsOwnerOrReadOnly,]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,]
