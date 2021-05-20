@@ -49,7 +49,8 @@ class StoreDirectory(models.Model):
     """
     Base Store Directory class, to create store directory objects
     """
-    owner = models.ForeignKey(VendorProfile, related_name='store_directories', on_delete=models.CASCADE)
+    owner = models.ForeignKey(
+        VendorProfile, related_name='store_directories', on_delete=models.CASCADE)
     store = models.ForeignKey(Store, related_name='directories', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     slug = models.SlugField()

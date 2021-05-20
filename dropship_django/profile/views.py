@@ -1,29 +1,26 @@
-from django.shortcuts import render
-from rest_framework import generics, status, views, permissions, viewsets
-from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.sites.shortcuts import get_current_site
-from django.urls import reverse
-from django.conf import settings
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.utils.encoding import smart_str, force_str, smart_bytes, DjangoUnicodeDecodeError
-from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from django.contrib.sites.shortcuts import get_current_site
-from django.urls import reverse
-from django.shortcuts import redirect
-from django.http import HttpResponsePermanentRedirect
-import jwt
 import os
 
-from drf_yasg.utils import swagger_auto_schema
+import jwt
+from django.conf import settings
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.contrib.sites.shortcuts import get_current_site
+from django.http import HttpResponsePermanentRedirect
+from django.shortcuts import redirect, render
+from django.urls import reverse
+from django.utils.encoding import (DjangoUnicodeDecodeError, force_str,
+                                   smart_bytes, smart_str)
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from drf_yasg import openapi
-
-from .serializers import *
-from .renderers import UserRenderer
-from utils.utils.utils import Util
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import generics, permissions, status, views, viewsets
+from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
 from utils.permissions.permissions import IsOwnerOrReadOnly
-from .models import User, ShopperProfile, VendorProfile
+from utils.utils.utils import Util
 
+from .models import ShopperProfile, User, VendorProfile
+from .renderers import UserRenderer
+from .serializers import *
 
 
 class RegisterView(generics.GenericAPIView):
@@ -48,7 +45,9 @@ class RegisterView(generics.GenericAPIView):
                 'email_subject': 'Verify your email'}
 
         Util.send_email(data)
-        return Response(user_data, status=status.HTTP_201_CREATED)
+        
+        response_data = [user_data, {'token': str(token)}]
+        return Response(response_data, status=status.HTTP_201_CREATED)
 
 
 class VerifyEmail(views.APIView):
@@ -61,7 +60,7 @@ class VerifyEmail(views.APIView):
     def get(self, request):
         token = request.GET.get('token')
         try:
-            payload = jwt.decode(token, settings.SECRET_KEY)
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
             user = User.objects.get(id=payload['user_id'])
             if not user.is_verified:
                 user.is_verified = True

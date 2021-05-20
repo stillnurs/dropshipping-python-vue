@@ -1,8 +1,7 @@
+from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
+                                        PermissionsMixin)
 from django.db import models
-
-from django.contrib.auth.models import (
-    AbstractBaseUser, BaseUserManager, PermissionsMixin,)
-from django.db import models
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 class UserManager(BaseUserManager):
@@ -25,6 +24,7 @@ class UserManager(BaseUserManager):
         user = self.create_user(username, email, password)
         user.is_superuser = True
         user.is_staff = True
+        user.has_delete_permission = True
         user.save()
         return user
 
@@ -70,7 +70,7 @@ class ShopperProfile(models.Model):
         verbose_name_plural = 'Shopper Profiles'
     
     def __str__(self):
-        return self.username
+        return self.first_name
 
 
 class VendorProfile(models.Model):
@@ -86,5 +86,5 @@ class VendorProfile(models.Model):
         verbose_name_plural = 'Vendor Profiles'
 
     def __str__(self):
-        return self.username
+        return self.first_name
 
